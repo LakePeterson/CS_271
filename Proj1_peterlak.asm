@@ -1,4 +1,4 @@
-Basic Logic and Arithmetic Program
+; Basic Logic and Arithmetic Program
 
 ; Author: Lake Peterson
 ; Last Modified: July 4, 2021
