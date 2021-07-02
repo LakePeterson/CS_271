@@ -2,7 +2,7 @@
 This repository is an archive of all the programming assignments for CS 271 at Oregon State University taken summer quarter 2021, taught by Justin Goins.
 
 ## Course Description
-In this course we were introduced to the functional organization and operation of digital computers. Coverage of assembly language; addressing, stacks, argument passing, arithmetic operations, decisions, macros, modularization, linkers and debuggers.
+In this course we were introduced to the functional organization and operation of digital computers. Coverage of assembly language; addressing, stacks, argument passing, arithmetic operations, decisions, macros, modularization, linkers and debuggers. By the end of the course, we are able to:
 
 - Access and Interpret binary data stored in memory
 - Illustrate the Instruction Execution Cycle
