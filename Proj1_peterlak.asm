@@ -10,13 +10,9 @@ TITLE Basic Logic and Arithmetic Program 1
 
 INCLUDE Irvine32.inc
 
-; (insert macro definitions here)
-
-; (insert constant definitions here)
-
 .data
 
-	Intro BYTE	"Welcome to the Volume Calculator by Student Name", 0
+	Intro BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
 	DirectionsOne BYTE	"Please enter two numbers that are greater than zero and", 0
 	DirectionsTwo BYTE	"I will use them to compute the volume of several shapes.", 0
 
@@ -26,6 +22,19 @@ INCLUDE Irvine32.inc
 	UserValueTwo DWORD ?
 
 	PrismVolume DWORD ?
+	PyramidVolume DWORD ?
+
+	PrismStatementOne BYTE "A prism that has an area of ", 0
+	PrismStatementTwo BYTE " meter(s) and a height", 0
+	PrismStatementThree BYTE "of ", 0
+	PrismStatementFour BYTE " meter(s) will have a volume of ", 0
+	PrismStatementFive BYTE " meter(s) cubed.", 0
+
+	PyramidStatementOne BYTE "A pyramid that has an area of ", 0
+	PyramidStatementTwo BYTE " meter(s) and a height", 0
+	PyramidStatementThree BYTE "of ", 0
+	PyramidStatementFour BYTE " meter(s) will have a volume of ", 0
+	PyramidStatementFive BYTE " meter(s) cubed.", 0
 
 ; (insert variable definitions here)
 
@@ -57,15 +66,64 @@ main PROC
 
 VolumeCalculations:
 
+	;Volume calculation for a prism
 	mov eax, UserValueOne
 	mov ebx, UserValueTwo
 	mul ebx
 	mov PrismVolume, eax
 
+	;Volume calculation for a pyramid
+	mov eax, UserValueOne
+	mov ebx, UserValueTwo
+	mul ebx
+	mov ebx, 3
+	div ebx
+	mov PyramidVolume, eax
+
+PrintCalculations:
+
+	;Print statemtent for prism volume calculation
+	mov edx, OFFSET PrismStatementOne
+	call WriteString
+	mov eax, UserValueOne
+	call WriteDec
+	mov edx, OFFSET PrismStatementTwo
+	call WriteString
+	call CrLf
+	mov edx, OFFSET PrismStatementThree
+	call WriteString
+	mov eax, UserValueTwo
+	call WriteDec
+	mov edx, OFFSET PrismStatementFour
+	call WriteString
 	mov eax, PrismVolume
 	call WriteDec
+	mov edx, OFFSET PrismStatementFive
+	call WriteString
+	call CrLf
+	call CrLf
 
-; (insert executable instructions here)
+	;Print statemtent for pyramid volume calculation
+	mov edx, OFFSET PyramidStatementOne
+	call WriteString
+	mov eax, UserValueOne
+	call WriteDec
+	mov edx, OFFSET PyramidStatementTwo
+	call WriteString
+	call CrLf
+	mov edx, OFFSET PyramidStatementThree
+	call WriteString
+	mov eax, UserValueTwo
+	call WriteDec
+	mov edx, OFFSET PyramidStatementFour
+	call WriteString
+	mov eax, PyramidVolume
+	call WriteDec
+	mov edx, OFFSET PyramidStatementFive
+	call WriteString
+	call CrLf
+
+
 
 	Invoke ExitProcess,0	; exit to operating system
 
