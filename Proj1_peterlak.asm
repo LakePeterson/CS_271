@@ -13,7 +13,7 @@ INCLUDE Irvine32.inc
 .data
 
 	;Strings used for printing out the intro/directions for using the calculator
-	Intro				BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
+	Intro			BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
 	DirectionsOne		BYTE	"Please enter two numbers that are greater than zero and", 0
 	DirectionsTwo		BYTE	"I will use them to compute the volume of several shapes.", 0
 	ClosingMessage		BYTE	"Thanks for using my calculator! Goodbye!", 0
