@@ -195,7 +195,7 @@ PrintCalculations:
 	call	CrLf
 
 EndMessage:
-
+	;Print closing message
 	mov	edx, OFFSET ClosingMessage
 	call	WriteString
 	call	CrLf
