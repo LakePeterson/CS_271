@@ -15,6 +15,7 @@ INCLUDE Irvine32.inc
 	Intro BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
 	DirectionsOne BYTE	"Please enter two numbers that are greater than zero and", 0
 	DirectionsTwo BYTE	"I will use them to compute the volume of several shapes.", 0
+	ClosingMessage BYTE	"Thanks for using my calculator! Goodbye!", 0
 
 	UserInputOne BYTE "First number: ", 0
 	UserValueOne DWORD ?
@@ -23,6 +24,8 @@ INCLUDE Irvine32.inc
 
 	PrismVolume DWORD ?
 	PyramidVolume DWORD ?
+	SphereVolumeOne DWORD ?
+	SphereVolumeTwo DWORD ?
 
 	PrismStatementOne BYTE "A prism that has an area of ", 0
 	PrismStatementTwo BYTE " meter(s) and a height", 0
@@ -36,7 +39,9 @@ INCLUDE Irvine32.inc
 	PyramidStatementFour BYTE " meter(s) will have a volume of ", 0
 	PyramidStatementFive BYTE " meter(s) cubed.", 0
 
-; (insert variable definitions here)
+	SphereStatementOne BYTE "A sphere with radius ", 0
+	SphereStatementTwo BYTE " meter(s) has a volume of ", 0
+	SphereStatementThree BYTE " meter(s) cubed.", 0
 
 .code
 main PROC
@@ -80,6 +85,34 @@ VolumeCalculations:
 	div ebx
 	mov PyramidVolume, eax
 
+	;Volume calculation for a sphere and first user input
+	mov eax, 4
+	mov ebx, 3141
+	mul ebx
+	mov ebx, UserValueOne
+	mul ebx
+	mov ebx, UserValueOne
+	mul ebx
+	mov ebx, UserValueOne
+	mul ebx
+	mov ebx, 3000
+	div ebx
+	mov SphereVolumeOne, eax
+
+	;Volume calculation for a sphere and second user input
+	mov eax, 4
+	mov ebx, 3141
+	mul ebx
+	mov ebx, UserValueTwo
+	mul ebx
+	mov ebx, UserValueTwo
+	mul ebx
+	mov ebx, UserValueTwo
+	mul ebx
+	mov ebx, 3000
+	div ebx
+	mov SphereVolumeTwo, eax
+
 PrintCalculations:
 
 	;Print statemtent for prism volume calculation
@@ -122,13 +155,43 @@ PrintCalculations:
 	mov edx, OFFSET PyramidStatementFive
 	call WriteString
 	call CrLf
+	call CrLf
 
+	;Print statemtent for Sphere volume calculation (First User Input)
+	mov edx, OFFSET SphereStatementOne
+	call WriteString
+	mov eax, UserValueOne
+	call WriteDec
+	mov edx, OFFSET SphereStatementTwo
+	call WriteString
+	mov eax, SphereVolumeOne
+	call WriteDec
+	mov edx, OFFSET SphereStatementThree
+	call WriteString
+	call CrLf
 
+	;Print statemtent for Sphere volume calculation (Second User Input)
+	mov edx, OFFSET SphereStatementOne
+	call WriteString
+	mov eax, UserValueTwo
+	call WriteDec
+	mov edx, OFFSET SphereStatementTwo
+	call WriteString
+	mov eax, SphereVolumeTwo
+	call WriteDec
+	mov edx, OFFSET SphereStatementThree
+	call WriteString
+	call CrLf
+	call CrLf
 
-	Invoke ExitProcess,0	; exit to operating system
+EndMessage:
+
+	mov edx, OFFSET ClosingMessage
+	call WriteString
+	call CrLf
+
+	Invoke ExitProcess, 0	; exit to operating system
 
 main ENDP
-
-; (insert additional procedures here)
 
 END main
