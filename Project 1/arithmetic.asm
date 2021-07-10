@@ -12,7 +12,7 @@ INCLUDE Irvine32.inc
 
 .data
 	;Strings used for printing out the intro/directions for using the calculator
-	Intro				BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
+	Intro			BYTE	"Welcome to the Volume Calculator by Lake Peterson", 0
 	DirectionsOne		BYTE	"Please enter two numbers that are greater than zero and", 0
 	DirectionsTwo		BYTE	"I will use them to compute the volume of several shapes.", 0
 	ClosingMessage		BYTE	"Thanks for using my calculator! Goodbye!", 0
@@ -24,7 +24,7 @@ INCLUDE Irvine32.inc
 	UserValueTwo		DWORD	?
 
 	;Variables used to store the product of the shapes volumes
-	PrismVolume			DWORD	?
+	PrismVolume		DWORD	?
 	PyramidVolume		DWORD	?
 	SphereVolumeOne		DWORD	?
 	SphereVolumeTwo		DWORD	?
@@ -51,31 +51,31 @@ INCLUDE Irvine32.inc
 .code
 main PROC
 	;Print intro/name and directions
-	mov		edx, OFFSET Intro
+	mov	edx, OFFSET Intro
 	call	WriteString
 	call	CrLf
 
 	;Print directions
-	mov		edx, OFFSET DirectionsOne
+	mov	edx, OFFSET DirectionsOne
 	call	WriteString
 	call	CrLf
 
 	;Print directions
-	mov		edx, OFFSET DirectionsTwo
+	mov	edx, OFFSET DirectionsTwo
 	call	WriteString
 	call	CrLf
 
 	;Get user input for the first value
-	mov		edx, OFFSET UserInputOne
+	mov	edx, OFFSET UserInputOne
 	call	WriteString
 	Call	ReadInt
-	mov		UserValueOne, eax
+	mov	UserValueOne, eax
 
 	;Get user input for the second value
-	mov		edx, OFFSET UserInputTwo
+	mov	edx, OFFSET UserInputTwo
 	call	WriteString
 	call	ReadInt
-	mov		UserValueTwo, eax
+	mov	UserValueTwo, eax
 	call	CrLf
 
 VolumeCalculations:
@@ -123,77 +123,77 @@ VolumeCalculations:
 
 PrintCalculations:
 	;Print statemtent for prism volume calculation
-	mov		edx, OFFSET PrismStmntOne
+	mov	edx, OFFSET PrismStmntOne
 	call	WriteString
-	mov		eax, UserValueOne
+	mov	eax, UserValueOne
 	call	WriteDec
-	mov		edx, OFFSET PrismStmntTwo
+	mov	edx, OFFSET PrismStmntTwo
 	call	WriteString
 	call	CrLf
-	mov		edx, OFFSET PrismStmntThree
+	mov	edx, OFFSET PrismStmntThree
 	call	WriteString
-	mov		eax, UserValueTwo
+	mov	eax, UserValueTwo
 	call	WriteDec
-	mov		edx, OFFSET PrismStmntFour
+	mov	edx, OFFSET PrismStmntFour
 	call	WriteString
-	mov		eax, PrismVolume
+	mov	eax, PrismVolume
 	call	WriteDec
-	mov		edx, OFFSET PrismStmntFive
+	mov	edx, OFFSET PrismStmntFive
 	call	WriteString
 	call	CrLf
 	call	CrLf
 
 	;Print statemtent for pyramid volume calculation
-	mov		edx, OFFSET PyramidStmntOne
+	mov	edx, OFFSET PyramidStmntOne
 	call	WriteString
-	mov		eax, UserValueOne
+	mov	eax, UserValueOne
 	call	WriteDec
-	mov		edx, OFFSET PyramidStmntTwo
+	mov	edx, OFFSET PyramidStmntTwo
 	call	WriteString
 	call	CrLf
-	mov		edx, OFFSET PyramidStmntThree
+	mov	edx, OFFSET PyramidStmntThree
 	call	WriteString
-	mov		eax, UserValueTwo
+	mov	eax, UserValueTwo
 	call	WriteDec
-	mov		edx, OFFSET PyramidStmntFour
+	mov	edx, OFFSET PyramidStmntFour
 	call	WriteString
-	mov		eax, PyramidVolume
+	mov	eax, PyramidVolume
 	call	WriteDec
-	mov		edx, OFFSET PyramidStmntFive
+	mov	edx, OFFSET PyramidStmntFive
 	call	WriteString
 	call	CrLf
 	call	CrLf
 
 	;Print statemtent for sphere volume calculation (First User Input)
-	mov		edx, OFFSET SphereStmntOne
+	mov	edx, OFFSET SphereStmntOne
 	call	WriteString
-	mov		eax, UserValueOne
+	mov	eax, UserValueOne
 	call	WriteDec
-	mov		edx, OFFSET SphereStmntTwo
+	mov	edx, OFFSET SphereStmntTwo
 	call	WriteString
-	mov		eax, SphereVolumeOne
+	mov	eax, SphereVolumeOne
 	call	WriteDec
-	mov		edx, OFFSET SphereStmntThree
+	mov	edx, OFFSET SphereStmntThree
 	call	WriteString
 	call	CrLf
 
 	;Print statemtent for sphere volume calculation (Second User Input)
-	mov		edx, OFFSET SphereStmntOne
+	mov	edx, OFFSET SphereStmntOne
 	call	WriteString
-	mov		eax, UserValueTwo
+	mov	eax, UserValueTwo
 	call	WriteDec
-	mov		edx, OFFSET SphereStmntTwo
+	mov	edx, OFFSET SphereStmntTwo
 	call	WriteString
-	mov		eax, SphereVolumeTwo
+	mov	eax, SphereVolumeTwo
 	call	WriteDec
-	mov		edx, OFFSET SphereStmntThree
+	mov	edx, OFFSET SphereStmntThree
 	call	WriteString
 	call	CrLf
 	call	CrLf
 
 EndMessage:
 	;Print closing message
-	mov		edx, OFFSET ClosingMessage
+	mov	edx, OFFSET ClosingMessage
 	call	WriteString
 	call	CrLf
 
