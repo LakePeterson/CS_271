@@ -60,7 +60,6 @@ _validRead:
   CALL  CrLf
 
 _EndFile:
-
   Invoke ExitProcess,0  				; exit to operating system
 main ENDP
 
