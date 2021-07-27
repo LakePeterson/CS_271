@@ -16,17 +16,17 @@ maximum = 181
 
 .data
 	;Strings used for printing out the intro/directions for using the calculator
-	Intro				BYTE	"Prime Numbers Programmed by Lake Peterson", 0
+	Intro			BYTE	"Prime Numbers Programmed by Lake Peterson", 0
 	DirectionsOne		BYTE	"Enter the number of prime numbers you would like to see", 0
 	DirectionsTwo		BYTE	"I will accept orders for up to 180 primes.", 0
-	Error				BYTE	"No primes for you! Number out of range. Try again.", 0
-	Space				BYTE	" ", 0
+	Error			BYTE	"No primes for you! Number out of range. Try again.", 0
+	Space			BYTE	" ", 0
 	FarewellMessage		BYTE	"Results certified by Lake Peterson. Goodbye.", 0
 
 	;Variables used to ask/store the values
-	UserInput			BYTE	"Enter the number of primes to display [1 ... 180]: ", 0
-	UserValue			DWORD	?
-	Counter				DWORD	0
+	UserInput		BYTE	"Enter the number of primes to display [1 ... 180]: ", 0
+	UserValue		DWORD	?
+	Counter			DWORD	0
 	CurrentValue		DWORD	2
 
 .code
@@ -39,16 +39,16 @@ main PROC
 
 introduction PROC
 	;Print intro/name and directions
-	mov		edx, OFFSET Intro
+	mov	edx, OFFSET Intro
 	call	WriteString
 	call	CrLf
 	call	CrLf
 
 	;Print directions
-	mov		edx, OFFSET DirectionsOne
+	mov	edx, OFFSET DirectionsOne
 	call	WriteString
 	call	CrLf
-	mov		edx, OFFSET DirectionsTwo
+	mov	edx, OFFSET DirectionsTwo
 	call	WriteString
 	call	CrLf
 	call	CrLf
@@ -58,10 +58,10 @@ introduction ENDP
 
 readData PROC
 	;Get user input so we know how many prime numbers to display
-	mov		edx, OFFSET UserInput
+	mov	edx, OFFSET UserInput
 	call	WriteString
 	call	ReadInt
-	mov		UserValue, eax
+	mov	UserValue, eax
 	call	validate
 
 	RET
@@ -69,18 +69,18 @@ readData ENDP
 
 validate PROC
 	;Validate user input to make sure it is within accepted bounds 1 - 180
-	mov		eax, maximum
-	cmp		eax, UserValue
-	jle		printError
-	mov		eax, minimum
-	cmp		eax, UserValue
-	jge		printError
+	mov	eax, maximum
+	cmp	eax, UserValue
+	jle	printError
+	mov	eax, minimum
+	cmp	eax, UserValue
+	jge	printError
 
 	RET
 
 	;Print the error message if the input is not within the speified bounds
 	printError:
-		mov		edx, OFFSET Error
+		mov	edx, OFFSET Error
 		call	WriteString
 		call	CrLf
 		call	readData
@@ -91,14 +91,14 @@ validate ENDP
 showPrimes PROC
 	;Find the prime numbers within the specified range
 	call	CrLf
-	mov		ecx, UserValue
-	mov		ebx, 0
+	mov	ecx, UserValue
+	mov	ebx, 0
 
 	;Looking for prime numbers
 	findPrime:
-		mov		eax, UserValue
-		cmp		eax, Counter
-		jle		farewell
+		mov	eax, UserValue
+		cmp	eax, Counter
+		jle	farewell
 		call	isPrime
 		jmp		findPrime
 
@@ -107,39 +107,39 @@ showPrimes ENDP
 
 isPrime	PROC
 	;Determines if the number is prime and then print out the prime number
-	mov		ecx, CurrentValue
-	dec		ecx
+	mov	ecx, CurrentValue
+	dec	ecx
 
 	;Checks to see if the number of disoplayed prime numbers is equavalent to user's value
 	primeNumberCount:
-		cmp		ecx, 1
-		je		primeNum
-		mov		eax, CurrentValue
+		cmp	ecx, 1
+		je	primeNum
+		mov	eax, CurrentValue
 		cdq
-		div		ecx
-		cmp		edx, 0
-		je		nonPrimeNum
+		div	ecx
+		cmp	edx, 0
+		je	nonPrimeNum
 		loop primeNumberCount
 
 		;Checks if a new line needs to be printed after 10 primes
 		primeNum:
-		cmp		ebx, 9
-		jle		newLineCheck
+		cmp	ebx, 9
+		jle	newLineCheck
 		call	CrLf
-		mov		ebx, 0
+		mov	ebx, 0
 
 		;Prints a newline and prints out the prime number
 		newLineCheck:
-		mov		eax, CurrentValue
+		mov	eax, CurrentValue
 		call	WriteDec
-		mov		edx, OFFSET Space
+		mov	edx, OFFSET Space
 		call	WriteString
-		inc		Counter
-		inc		ebx
+		inc	Counter
+		inc	ebx
 
 		;If prime is not found increment the current value
 		nonPrimeNum:
-		inc		CurrentValue
+		inc	CurrentValue
 
 	RET
 isPrime ENDP
@@ -148,7 +148,7 @@ farewell PROC
 	;Print farewell message
 	call	CrLf
 	call	CrLf
-	mov		edx, OFFSET FarewellMessage
+	mov	edx, OFFSET FarewellMessage
 	call	WriteString
 	call	CrLf
 
