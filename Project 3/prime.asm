@@ -119,7 +119,7 @@ isPrime	PROC
 		div	ecx
 		cmp	edx, 0
 		je	nonPrimeNum
-		loop primeNumberCount
+		loop 	primeNumberCount
 
 		;Checks if a new line needs to be printed after 10 primes
 		primeNum:
