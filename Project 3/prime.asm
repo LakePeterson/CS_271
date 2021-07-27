@@ -19,18 +19,19 @@ maximum = 181
 	Intro				BYTE	"Prime Numbers Programmed by Lake Peterson", 0
 	DirectionsOne		BYTE	"Enter the number of prime numbers you would like to see", 0
 	DirectionsTwo		BYTE	"I will accept orders for up to 180 primes.", 0
-	ErrorMessage		BYTE	"No primes for you! Number out of range. Try again.", 0
+	Error				BYTE	"No primes for you! Number out of range. Try again.", 0
 	Space				BYTE	" ", 0
 	FarewellMessage		BYTE	"Results certified by Lake Peterson. Goodbye.", 0
 
 	;Variables used to ask/store the values
 	UserInput			BYTE	"Enter the number of primes to display [1 ... 180]: ", 0
 	UserValue			DWORD	?
-	Pick				DWORD	0
+	Counter				DWORD	0
 	CurrentValue		DWORD	2
 
 .code
 main PROC
+	;Procedure calls for the program
 	call	introduction
 	call	readData
 	call	showPrimes
@@ -79,7 +80,7 @@ validate PROC
 
 	;Print the error message if the input is not within the speified bounds
 	printError:
-		mov		edx, OFFSET ErrorMessage
+		mov		edx, OFFSET Error
 		call	WriteString
 		call	CrLf
 		call	readData
@@ -94,12 +95,12 @@ showPrimes PROC
 	mov		ebx, 0
 
 	;Looking for prime numbers
-	checkPrime:
-		mov		eax, Pick
-		cmp		eax, UserValue
-		jge		farewell
+	findPrime:
+		mov		eax, UserValue
+		cmp		eax, Counter
+		jle		farewell
 		call	isPrime
-		jmp		checkPrime
+		jmp		findPrime
 
 	RET
 showPrimes ENDP
@@ -109,7 +110,8 @@ isPrime	PROC
 	mov		ecx, CurrentValue
 	dec		ecx
 
-	printPrimeNumbers:
+	;Checks to see if the number of disoplayed prime numbers is equavalent to user's value
+	primeNumberCount:
 		cmp		ecx, 1
 		je		primeNum
 		mov		eax, CurrentValue
@@ -117,21 +119,25 @@ isPrime	PROC
 		div		ecx
 		cmp		edx, 0
 		je		nonPrimeNum
+		loop primeNumberCount
 
-	loop printPrimeNumbers
+		;Checks if a new line needs to be printed after 10 primes
 		primeNum:
 		cmp		ebx, 9
 		jle		newLineCheck
 		call	CrLf
 		mov		ebx, 0
 
+		;Prints a newline and prints out the prime number
 		newLineCheck:
 		mov		eax, CurrentValue
 		call	WriteDec
 		mov		edx, OFFSET Space
 		call	WriteString
-		inc		Pick
+		inc		Counter
 		inc		ebx
+
+		;If prime is not found increment the current value
 		nonPrimeNum:
 		inc		CurrentValue
 
@@ -152,5 +158,4 @@ farewell PROC
 farewell ENDP
 
 main ENDP
-
 END main
