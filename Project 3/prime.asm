@@ -100,7 +100,7 @@ showPrimes PROC
 		cmp	eax, Counter
 		jle	farewell
 		call	isPrime
-		jmp		findPrime
+		jmp	findPrime
 
 	RET
 showPrimes ENDP
