@@ -11,9 +11,9 @@ TITLE Arrays, Addressing, and Stack-Passed Parameters Program 4
 INCLUDE Irvine32.inc
 
 ;set constants
-HI = 10
-LO = 29
-ARRAYSIZE = 180
+HI = 29
+LO = 10
+ARRAYSIZE = 200
 
 .data
 	;Strings used for printing out the intro/directions for using the calculator
@@ -22,14 +22,16 @@ ARRAYSIZE = 180
 	DirectionsTwo		BYTE	"array of generated numbers, counts how many times each number appears,", 0
 	DirectionsThree		BYTE	"and then displays the number of instances of each value,", 0
 	DirectionsFour		BYTE	"starting with the number of 10s.", 0
-	DisplayNumbers		BYTE	"Your random numbers:", 0
+	unsortedTitle		BYTE	"Your random numbers:", 0
+    Spaces              BYTE    " ", 0
 	DisplayResultsOne	BYTE	"I counted all of the values and computed the following results. The top line", 0
 	DisplayResultsTwo	BYTE	"shows the value and the lower line shows the corresponding count.", 0
 	NumberList			BYTE	"010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029", 0
 	GoodbyeMessage		BYTE	"Goodbye, and thanks for using this program!", 0
 
 	;Variables used to ask/store the values
-	numberArray			DWORD	ARRAYSIZE DUP(?)
+	randomNumberArray	DWORD	ARRAYSIZE DUP(?)
+    numbersInLine   DWORD   0
 
 .code
 main PROC
@@ -45,10 +47,19 @@ main PROC
 	call	introduction
 
 	;Procedure call to fill the dedicated array with random value
-	;call	fillArray
+	push	OFFSET ARRAYSIZE
+    push	OFFSET randomNumberArray
+    push	OFFSET HI
+    push	OFFSET LO
+    call	fillArray
 
 	;Procedure call to display the entries of someArray to the user
-	;call	displayList
+    ;Display unsorted array to the console
+    push            OFFSET numbersInLine
+    push            OFFSET unsortedTitle
+    push            OFFSET ARRAYSIZE
+    push            OFFSET randomNumberArray
+    call            displayList
 
 	;Procedure call to print a zero-padded header of values
 	;call	displayHeader
@@ -71,26 +82,26 @@ main PROC
 ;	[ebp+8]  = reference to message
 ; ---------------------------------------------------------------------------------
 introduction PROC
-	;Initialze Stack
+	;Initialize Stack
 	push	ebp
     mov		ebp, esp
 
 	;Print intro/name and directions
-	mov		edx, [ebp + 24]
+	mov		edx, [ebp+24]
     call	WriteString
     call    CrLf
 	
 	;Print directions
-	mov		edx, [ebp + 20]
+	mov		edx, [ebp+20]
     call	WriteString
     call    CrLf
-	mov		edx, [ebp + 16]
+	mov		edx, [ebp+16]
     call	WriteString
     call    CrLf
-	mov		edx, [ebp + 12]
+	mov		edx, [ebp+12]
     call	WriteString
     call    CrLf
-	mov		edx, [ebp + 8]
+	mov		edx, [ebp+8]
     call	WriteString
     call    CrLf
 	call    CrLf
@@ -100,6 +111,91 @@ introduction PROC
     ret		16
 
 introduction ENDP
+
+; ---------------------------------------------------------------------------------
+; Name: fillArray
+; Description: Inserts random integers (10 - 29) into an array
+; Preconditions: The array must only contain positive values between 10 and 29 
+; Postconditions: Array must be filled with values and be size of ARRAYSIZE 
+; Receives:
+;   [ebp+20] = ARRAYSIZE -> Length of the array
+;	[ebp+16] = randNumberArray -> The array
+;	[ebp+12] = HI -> Constant value and upper bound for accepted values (29)
+;	[ebp+8] = LO -> Constant value and lower bound for accepted values (10)
+; returns: An array that is filled with positive integers
+; ---------------------------------------------------------------------------------
+fillArray PROC
+    ;Initialize Stack
+	push	ebp
+    mov		ebp, esp
+
+    ;Move parameters into registers
+    mov     ecx, [ebp+20]
+    mov     esi, [ebp+16]
+    ;mov     ecx, [ebp+12]
+
+    ;Determine a value 10 - 29 and insert into the array
+    insertRandVal:
+        mov     eax, [ebp+12]
+        sub     eax, [ebp+8]
+        add     eax, 1
+        call    RandomRange
+        add     eax, [ebp+8]
+        mov     [esi], eax
+        add     esi, 4
+        loop    insertRandVal
+
+    ;Clean Stack
+	pop     ebp
+    ret		12
+
+fillArray ENDP
+
+displayList PROC
+
+    ;Set stack frame
+    push            ebp
+    mov             ebp, esp
+
+    ; Display section title
+    mov             edx, [ebp + 16] ;Title
+    call            WriteString
+    call            CRLF
+
+    mov             ecx, [ebp + 12] ;ArraySize
+    mov             esi, [ebp + 8] ;List
+    mov             edx, [ebp + 20] ;numbersInLine
+
+    mov             edx, 0
+
+    beginLoop:
+
+        ;Display the number and account for spaces
+        mov             eax, [esi]
+        call            WriteDec
+        mov             edx, OFFSET Spaces
+        call            WriteString
+        inc             edx
+
+        ;Check if new line is needed. If 10 number in the line already
+        mov             edx, 0
+        mov             eax, edx
+        mov             ebx, 10
+        div             ebx
+        cmp             ebx, 0
+        jne             endLoop
+        call            CRLF
+
+    endLoop:
+        add             esi, 4
+        loop            beginLoop
+
+    call            CRLF
+    call            CRLF
+
+    pop             ebp
+    ret             16
+displayList ENDP
 
 ; ---------------------------------------------------------------------------------
 ; Name: goodbye
@@ -116,11 +212,7 @@ goodbye PROC
 	mov		edx, [ebp + 8]
     call	WriteString
     call    CrLf
-
-	;Clean Stack
-	pop		ebp
-    ret		12
-	exit
+    exit
 
 goodbye ENDP
 
