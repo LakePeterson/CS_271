@@ -6,17 +6,20 @@ TITLE Arrays, Addressing, and Stack-Passed Parameters Program 4
 ; Course number/section: CS271 Section 001
 ; Project Number: 4
 ; Due Date: August 3, 2021
-; Description: Determines a filled array with 200 numbers and then counts each instance of the random numnbers
+; Description: Determines a filled array with 200 numbers and then counts each instance of the random numbers
 
 INCLUDE Irvine32.inc
 
 ;CONSTANT VALUES
+.const
 HI = 29
 LO = 10
 ARRAYSIZE = 200
+COUNTSIZE = 20
+ZEROPAD = 1
 
 .data
-	;Strings used for printing out the intro/directions for using the calculator
+    ;Strings used for printing out the intro/directions for using the calculator
 	Intro				BYTE	"Generating and Counting Random integers! Programmed by Lake Peterson.", 0
 	DirectionsOne		BYTE	"This program generates ", 0
     DirectionsTwo       BYTE    " random numbers in the range [", 0
@@ -27,58 +30,71 @@ ARRAYSIZE = 200
 	DirectionsSeven		BYTE	"starting with the number of ", 0
     DirectionsEight     BYTE    "s.", 0
 	DisplayNumbers		BYTE	"Your random numbers:", 0
+    SinglePadding       BYTE    "0", 0
+    DoublePadding       BYTE    "00", 0
     Spaces              BYTE    " ", 0
 	DisplayResultsOne	BYTE	"I counted all of the values and computed the following results. The top line", 0
 	DisplayResultsTwo	BYTE	"shows the value and the lower line shows the corresponding count.", 0
 	NumberList			BYTE	"010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029", 0
 	GoodbyeMessage		BYTE	"Goodbye, and thanks for using this program!", 0
 
-	;Variables used to ask/store the values
-	randomNumberArray	DWORD	ARRAYSIZE DUP(?)
-    zeroPad             DWORD   0
+	;Arrays used to store the values
+	randomNumberArray	DWORD	ARRAYSIZE   DUP(?)
+    counterArray        DWORD   COUNTSIZE   DUP(?)
 
 .code
 main PROC
-	;Get the random number generator started
+
+    ;Get the random number generator started
 	call randomize
 
 	;Procedure call for the introduction of the program
-	push	OFFSET Intro
-	push	OFFSET DirectionsOne
-	push	OFFSET DirectionsTwo
-	push	OFFSET DirectionsThree
-	push	OFFSET DirectionsFour
-    push	OFFSET DirectionsFive
-	push	OFFSET DirectionsSix
-	push	OFFSET DirectionsSeven
-	push	OFFSET DirectionsEight
     push	OFFSET ARRAYSIZE
     push	OFFSET HI
     push	OFFSET LO
 	call	introduction
 
-	;Procedure call to fill the dedicated array with random value
+    ;Procedure call to fill the dedicated array with random value
 	push	OFFSET ARRAYSIZE
     push	OFFSET randomNumberArray
     push	OFFSET HI
     push	OFFSET LO
     call	fillArray
 
-	;Procedure call to display the entries of someArray to the user
-    ;Display unsorted array to the console
+    ;Procedure call to display the entries of someArray to the user
+    push    OFFSET ZEROPAD
     push    OFFSET ARRAYSIZE
     push    OFFSET randomNumberArray
-    push    OFFSET zeroPad
     call    displayList
 
-	;Procedure call to print a zero-padded header of values
-	;call	displayHeader
+    ;Procedure call to rearrange the array so it is easier to count
+    push    OFFSET ARRAYSIZE
+    push    OFFSET randomNumberArray
+    call    rearrangeList
 
-	;Procedure call to inspect each element of someArray1 and keeps track of how many instances were found
-	;call	countList
+    ;Procedure call to print a zero-padded header of values
+    push	OFFSET HI
+    push	OFFSET LO
+	call	displayHeader
+    
+    ;Procedure call to print a counted instnaces of each number
+    push    OFFSET HI
+    push    OFFSET counterArray
+    push    OFFSET LO
+    push    OFFSET randomNumberArray
+    push    OFFSET ARRAYSIZE
+    call    countList
 
-	;Procedure call for the goodbye message of the program
+    ;Display sorted array to the console
+    push    OFFSET ZEROPAD
+    push    OFFSET COUNTSIZE
+    push    OFFSET counterArray
+    call    displayList
+
+    ;Procedure call for the goodbye message of the program
 	call	goodbye
+
+    exit
 
 ; ---------------------------------------------------------------------------------
 ; Name: introduction
@@ -129,6 +145,9 @@ introduction PROC
     call	WriteString
     call    CrLf
     call    CrLf
+    mov     edx, OFFSET DisplayNumbers
+    call    WriteString
+    call    CrLf
 
 	;Clean Stack
 	pop		ebp
@@ -146,7 +165,7 @@ introduction ENDP
 ;	[ebp+16] = randNumberArray -> The array
 ;	[ebp+12] = HI -> Constant value and upper bound for accepted values
 ;	[ebp+8] = LO -> Constant value and lower bound for accepted values
-; returns: Nothing
+; Returns: Nothing
 ; ---------------------------------------------------------------------------------
 fillArray PROC
     ;Initialize Stack
@@ -182,9 +201,9 @@ fillArray ENDP
 ; Preconditions: The array must be filled.
 ; Postconditions: None
 ; Receives:
-;	[ebp+16] = ARRAYSIZE -> Length of the array
-;	[ebp+12] = randNumberArray -> The array
-;	[ebp+8]  = zeroPad -> Indicates if the numbers are padded with leading zeros
+;	[ebp+16] = zeroPad -> Indicates if the numbers are padded with leading zeros
+;	[ebp+12] = ARRAYSIZE -> Length of the array
+;	[ebp+8]  = randNumberArray -> The array
 ; returns: Prints the contents of the array to the screen.
 ; ---------------------------------------------------------------------------------
 displayList PROC
@@ -192,15 +211,10 @@ displayList PROC
 	push	ebp
     mov		ebp, esp
 
-    ; Display section title
-    mov             edx, OFFSET DisplayNumbers
-    call            WriteString
-    call            CrLf
-
     ;Move parameters and values into registers to setup printing the array
     mov             ebx, 1
-    mov             ecx, [ebp + 16]
-    mov             esi, [ebp + 12]
+    mov             ecx, [ebp + 12]
+    mov             esi, [ebp + 8]
 
     printArray:
         ;Display the number and account for spaces
@@ -217,21 +231,213 @@ displayList PROC
     newLine:
         call    CrLf
         mov     ebx, 1
+        add     esi, 4
         loop    printArray
 
     call    CrLf
 
     ;Clean Stack
 	pop     ebp
-    ret		16
+    ret		12
 
 displayList ENDP
 
 ; ---------------------------------------------------------------------------------
+; Name: displayHeader
+; Description:
+; Preconditions:
+; Postconditions:
+; Receives:
+;	[ebp+12] = HI -> Constant value and upper bound for accepted values
+;	[ebp+8]  = LO -> Constant value and lower bound for accepted values
+; returns:
+; ---------------------------------------------------------------------------------
+displayHeader PROC
+    ;Initialize Stack
+	push	ebp
+    mov		ebp, esp
+
+    ;Display the count header
+    mov     edx, OFFSET DisplayResultsOne
+    call	WriteString
+    call    CrLf
+    mov     edx, OFFSET DisplayResultsTwo
+    call	WriteString
+    call    CrLf
+
+    ;Move parameters and values into registers to setup printing the array
+    mov     eax, [ebp+8]
+    mov     ecx, 20
+
+    ;Print the values in the display header
+    printSingleHeader:
+        cmp     eax, 9
+        jle     printDoubleHeader
+        mov     edx, OFFSET SinglePadding
+        call    WriteString
+        call    WriteDec
+        mov     edx, OFFSET Spaces
+        call    WriteString
+        add     eax, 1
+        loop    printSingleHeader
+
+    printDoubleHeader:
+        cmp     ecx, 0
+        je      exitLoop
+        mov     edx, OFFSET DoublePadding
+        call    WriteString
+        call    WriteDec
+        mov     edx, OFFSET Spaces
+        call    WriteString
+        add     eax, 1
+        loop    printSingleHeader
+
+    exitLoop:
+        call    CrLf
+
+    ;Clean Stack
+	pop     ebp
+    ret		8
+
+displayHeader ENDP
+
+; ---------------------------------------------------------------------------------
+; Name: rearrangeList
+; Description: 
+; Preconditions:
+; Postconditions:
+; Receives:
+;	[ebp+12] = ARRAYSIZE -> Length of the array
+;	[ebp+8]  = randNumberArray -> The array
+; returns:
+; ---------------------------------------------------------------------------------
+rearrangeList PROC
+	;Initialize Stack
+	push	ebp
+    mov		ebp, esp
+
+    ;Move parameters and values into registers to setup switching the numbers
+    mov     ebx, 0
+    mov     edi, [ebp + 8]
+    mov     ecx, [ebp + 12]
+    sub     ecx, 1
+
+	;Loop to put the numbers in the array in order
+	switch:
+		mov		esi, edi
+        push	esi
+		mov		ebx, ecx
+        push	ecx
+		call	switchNumbers
+		mov		ecx, ebx
+		loop	switch
+
+	;Clean Stack
+	pop     ebp
+    ret		8
+
+rearrangeList ENDP
+
+; ---------------------------------------------------------------------------------
+; Name: switchNumbers
+; Description: Helper function to rearrangeList
+; Preconditions:
+; Postconditions:
+; Returns:
+; ---------------------------------------------------------------------------------
+switchNumbers PROC
+	;Initialize Stack
+	push	ebp
+    mov		ebp, esp
+
+	switchNum:
+		mov		eax, [esi]
+        add     esi, 4
+		mov		edx, [esi]
+        sub     esi, 4
+		cmp		eax, edx
+		jl		continue
+        cmp		eax, edx
+		je		continue
+		mov		[esi], edx
+        add     esi, 4
+		mov		[esi], eax
+        sub     esi, 4
+	
+	continue:
+		add		esi, 4
+		loop	switchNum
+
+	cleanStack:
+	    pop     ebp
+        ret		8
+
+switchNumbers ENDP
+
+; ---------------------------------------------------------------------------------
+; Name: countList
+; Description: 
+; Preconditions:
+; Postconditions:
+; Receives:
+;	[ebp+12] = ARRAYSIZE -> Length of the array
+;	[ebp+8]  = randNumberArray -> The array
+; returns:
+; ---------------------------------------------------------------------------------
+countList PROC
+    ;Initialize Stack
+	push	ebp
+    mov		ebp, esp
+
+    ;Move parameters and values into registers to setup switching the numbers
+    mov     ecx, [ebp+8]
+    mov     esi, [ebp+12]
+    mov     edx, [ebp+16]
+    mov     edi, [ebp+20]
+    mov     ebx, 0
+
+    ;Count the values in the original array
+    countNumbers:
+        mov     eax, [esi]
+        cmp     edx, eax
+        je      findNext
+        cmp     edx, [ebp+16]
+        jg      foundSame
+        jmp     insertCount
+
+    ;Counter needs increased because the number is the same
+    foundSame:
+        add     ebx, 1
+
+    ;Stores the counted value into the count array
+    insertCount:
+        mov     edx, eax
+        add     esi, 4
+        push    ecx
+        mov     ecx, eax
+        mov     eax, ebx
+        mov     [edi], eax
+        add     edi, 4
+        mov     eax, ecx
+        pop     ecx
+        mov     ebx, 0
+
+    ;Number count increased and move to next index in the array
+    findNext:
+        mov     edx, eax
+        add     esi, 4
+        add     ebx, 1
+        loop    countNumbers
+
+    ;Clean Stack
+	pop     ebp
+    ret		16
+
+countList ENDP
+
+; ---------------------------------------------------------------------------------
 ; Name: goodbye
 ; Descritpion: Displays an goodbye message and the directions for the program.
-; Receives:
-;	[ebp+8]  = reference to message
 ; ---------------------------------------------------------------------------------
 goodbye PROC
 	;Print goodbye message
