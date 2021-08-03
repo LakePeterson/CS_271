@@ -1,19 +1,19 @@
 TITLE Arrays, Addressing, and Stack-Passed Parameters Program 4
 
 ; Author: Lake Peterson
-; Last Modified: July 30, 2021
+; Last Modified: August 3, 2021
 ; OSU email address: peterlak@oregonstate.edu
 ; Course number/section: CS271 Section 001
 ; Project Number: 4
 ; Due Date: August 3, 2021
-; Description: Determines a filled array with 200 numbers and then counts each instance of the random numbers
+; Description: Determines a filled array with 180, 200, or 220 numbers and then counts each instance of the random numbers
 
 INCLUDE Irvine32.inc
 
 ;CONSTANT VALUES
 .const
-HI = 29
-LO = 10
+HI = 32
+LO = 13
 ARRAYSIZE = 200
 COUNTSIZE = 20
 ZEROPAD = 1
@@ -42,9 +42,12 @@ ZEROPAD = 1
 	randomNumberArray	DWORD	ARRAYSIZE   DUP(?)
     counterArray        DWORD   COUNTSIZE   DUP(?)
 
+; ---------------------------------------------------------------------------------
+; Name: main
+; Descritpion: Controls the operation of the program.
+; ---------------------------------------------------------------------------------
 .code
 main PROC
-
     ;Get the random number generator started
 	call randomize
 
@@ -61,7 +64,7 @@ main PROC
     push	OFFSET LO
     call	fillArray
 
-    ;Procedure call to display the entries of someArray to the user
+    ;Procedure call to display the numbers generated numbers to the user
     push    OFFSET ZEROPAD
     push    OFFSET ARRAYSIZE
     push    OFFSET randomNumberArray
@@ -77,7 +80,7 @@ main PROC
     push	OFFSET LO
 	call	displayHeader
     
-    ;Procedure call to print a counted instnaces of each number
+    ;Procedure call to print a count the instances of each number
     push    OFFSET HI
     push    OFFSET counterArray
     push    OFFSET LO
@@ -85,7 +88,7 @@ main PROC
     push    OFFSET ARRAYSIZE
     call    countList
 
-    ;Display sorted array to the console
+    ;Procedure call to display the counted instances to the user
     push    OFFSET ZEROPAD
     push    OFFSET COUNTSIZE
     push    OFFSET counterArray
@@ -201,10 +204,10 @@ fillArray ENDP
 ; Preconditions: The array must be filled.
 ; Postconditions: None
 ; Receives:
-;	[ebp+16] = zeroPad -> Indicates if the numbers are padded with leading zeros
+;	[ebp+16] = ZEROPAD -> Indicates if the numbers are padded with leading zeros
 ;	[ebp+12] = ARRAYSIZE -> Length of the array
 ;	[ebp+8]  = randNumberArray -> The array
-; returns: Prints the contents of the array to the screen.
+; Returns: Prints the contents of the array to the screen.
 ; ---------------------------------------------------------------------------------
 displayList PROC
     ;Initialize Stack
@@ -212,10 +215,11 @@ displayList PROC
     mov		ebp, esp
 
     ;Move parameters and values into registers to setup printing the array
-    mov             ebx, 1
-    mov             ecx, [ebp + 12]
-    mov             esi, [ebp + 8]
+    mov     ebx, 1
+    mov     ecx, [ebp + 12]
+    mov     esi, [ebp + 8]
 
+    ;Displays the contents ccontained within array
     printArray:
         ;Display the number and account for spaces
         mov     eax, [esi]
@@ -228,6 +232,7 @@ displayList PROC
         add     esi, 4
         loop    printArray
 
+    ;Prints a new line
     newLine:
         call    CrLf
         mov     ebx, 1
@@ -244,13 +249,13 @@ displayList ENDP
 
 ; ---------------------------------------------------------------------------------
 ; Name: displayHeader
-; Description:
-; Preconditions:
-; Postconditions:
+; Description: Prints a zero padded header for the counted values
+; Preconditions: HI and LO bounds needed to create
+; Postconditions: None
 ; Receives:
 ;	[ebp+12] = HI -> Constant value and upper bound for accepted values
 ;	[ebp+8]  = LO -> Constant value and lower bound for accepted values
-; returns:
+; Returns: Header is displayed
 ; ---------------------------------------------------------------------------------
 displayHeader PROC
     ;Initialize Stack
@@ -269,7 +274,7 @@ displayHeader PROC
     mov     eax, [ebp+8]
     mov     ecx, 20
 
-    ;Print the values in the display header
+    ;Print the values in the display header with single padding
     printSingleHeader:
         cmp     eax, 9
         jle     printDoubleHeader
@@ -281,6 +286,7 @@ displayHeader PROC
         add     eax, 1
         loop    printSingleHeader
 
+    ;Appends a double zero padding
     printDoubleHeader:
         cmp     ecx, 0
         je      exitLoop
@@ -292,6 +298,7 @@ displayHeader PROC
         add     eax, 1
         loop    printSingleHeader
 
+    ;Leave loop once upper bound is hit
     exitLoop:
         call    CrLf
 
@@ -303,13 +310,13 @@ displayHeader ENDP
 
 ; ---------------------------------------------------------------------------------
 ; Name: rearrangeList
-; Description: 
-; Preconditions:
-; Postconditions:
+; Description: List is orginaized from hi to lo order so that I can count it easier
+; Preconditions: Array and array size is needed
+; Postconditions: Array must give the exact same amount of values once organized
 ; Receives:
 ;	[ebp+12] = ARRAYSIZE -> Length of the array
 ;	[ebp+8]  = randNumberArray -> The array
-; returns:
+; Returns: Array arranged lo to hi
 ; ---------------------------------------------------------------------------------
 rearrangeList PROC
 	;Initialize Stack
@@ -341,15 +348,16 @@ rearrangeList ENDP
 ; ---------------------------------------------------------------------------------
 ; Name: switchNumbers
 ; Description: Helper function to rearrangeList
-; Preconditions:
-; Postconditions:
-; Returns:
+; Preconditions: Swaps the numbers
+; Postconditions: Smaller number is swapped
+; Returns: None
 ; ---------------------------------------------------------------------------------
 switchNumbers PROC
 	;Initialize Stack
 	push	ebp
     mov		ebp, esp
 
+    ;Switch position of the numbers if needed
 	switchNum:
 		mov		eax, [esi]
         add     esi, 4
@@ -364,10 +372,12 @@ switchNumbers PROC
 		mov		[esi], eax
         sub     esi, 4
 	
+    ;Go to next number
 	continue:
 		add		esi, 4
 		loop	switchNum
 
+    ;Clean Stack
 	cleanStack:
 	    pop     ebp
         ret		8
@@ -376,13 +386,13 @@ switchNumbers ENDP
 
 ; ---------------------------------------------------------------------------------
 ; Name: countList
-; Description: 
-; Preconditions:
-; Postconditions:
+; Description: Counts each instance in the original array and stored in secondary array
+; Preconditions: Original array must be sorted lo to high
+; Postconditions: Count stored in secondary array
 ; Receives:
 ;	[ebp+12] = ARRAYSIZE -> Length of the array
 ;	[ebp+8]  = randNumberArray -> The array
-; returns:
+; Returns: None
 ; ---------------------------------------------------------------------------------
 countList PROC
     ;Initialize Stack
