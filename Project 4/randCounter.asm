@@ -20,26 +20,26 @@ ZEROPAD = 1
 
 .data
     ;Strings used for printing out the intro/directions for using the calculator
-	Intro				BYTE	"Generating and Counting Random integers! Programmed by Lake Peterson.", 0
-	DirectionsOne		BYTE	"This program generates ", 0
+    Intro		BYTE	"Generating and Counting Random integers! Programmed by Lake Peterson.", 0
+    DirectionsOne	BYTE	"This program generates ", 0
     DirectionsTwo       BYTE    " random numbers in the range [", 0
     DirectionsThree     BYTE    " ... ", 0
     DirectionsFour      BYTE    "], displays the", 0
-	DirectionsFive		BYTE	"array of generated numbers, counts how many times each number appears,", 0
-	DirectionsSix		BYTE	"and then displays the number of instances of each value,", 0
-	DirectionsSeven		BYTE	"starting with the number of ", 0
+    DirectionsFive	BYTE	"array of generated numbers, counts how many times each number appears,", 0
+    DirectionsSix	BYTE	"and then displays the number of instances of each value,", 0
+    DirectionsSeven	BYTE	"starting with the number of ", 0
     DirectionsEight     BYTE    "s.", 0
-	DisplayNumbers		BYTE	"Your random numbers:", 0
+    DisplayNumbers	BYTE	"Your random numbers:", 0
     SinglePadding       BYTE    "0", 0
     DoublePadding       BYTE    "00", 0
     Spaces              BYTE    " ", 0
-	DisplayResultsOne	BYTE	"I counted all of the values and computed the following results. The top line", 0
-	DisplayResultsTwo	BYTE	"shows the value and the lower line shows the corresponding count.", 0
-	NumberList			BYTE	"010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029", 0
-	GoodbyeMessage		BYTE	"Goodbye, and thanks for using this program!", 0
+    DisplayResultsOne	BYTE	"I counted all of the values and computed the following results. The top line", 0
+    DisplayResultsTwo	BYTE	"shows the value and the lower line shows the corresponding count.", 0
+    NumberList		BYTE	"010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029", 0
+    GoodbyeMessage	BYTE	"Goodbye, and thanks for using this program!", 0
 
-	;Arrays used to store the values
-	randomNumberArray	DWORD	ARRAYSIZE   DUP(?)
+    ;Arrays used to store the values
+    randomNumberArray	DWORD	ARRAYSIZE   DUP(?)
     counterArray        DWORD   COUNTSIZE   DUP(?)
 
 ; ---------------------------------------------------------------------------------
@@ -49,20 +49,20 @@ ZEROPAD = 1
 .code
 main PROC
     ;Get the random number generator started
-	call randomize
+    call    randomize
 
-	;Procedure call for the introduction of the program
-    push	OFFSET ARRAYSIZE
-    push	OFFSET HI
-    push	OFFSET LO
-	call	introduction
+    ;Procedure call for the introduction of the program
+    push    OFFSET ARRAYSIZE
+    push    OFFSET HI
+    push    OFFSET LO
+    call    introduction
 
     ;Procedure call to fill the dedicated array with random value
-	push	OFFSET ARRAYSIZE
-    push	OFFSET randomNumberArray
-    push	OFFSET HI
-    push	OFFSET LO
-    call	fillArray
+    push    OFFSET ARRAYSIZE
+    push    OFFSET randomNumberArray
+    push    OFFSET HI
+    push    OFFSET LO
+    call    fillArray
 
     ;Procedure call to display the numbers generated numbers to the user
     push    OFFSET ZEROPAD
@@ -76,9 +76,9 @@ main PROC
     call    rearrangeList
 
     ;Procedure call to print a zero-padded header of values
-    push	OFFSET HI
-    push	OFFSET LO
-	call	displayHeader
+    push    OFFSET HI
+    push    OFFSET LO
+    call    displayHeader
     
     ;Procedure call to print a count the instances of each number
     push    OFFSET HI
@@ -95,7 +95,7 @@ main PROC
     call    displayList
 
     ;Procedure call for the goodbye message of the program
-	call	goodbye
+    call    goodbye
 
     exit
 
@@ -104,57 +104,57 @@ main PROC
 ; Descritpion: Displays an intro message and the directions for the program.
 ; Receives:
 ;   [ebp+16] = ARRAYSIZE -> Length of the array
-;	[ebp+12] = HI -> Constant value and upper bound for accepted values
-;	[ebp+8]  = LO -> Constant value and lower bound for accepted values
+;   [ebp+12] = HI -> Constant value and upper bound for accepted values
+;   [ebp+8]  = LO -> Constant value and lower bound for accepted values
 ; ---------------------------------------------------------------------------------
 introduction PROC
-	;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    ;Initialize Stack
+    push    ebp
+    mov     ebp, esp
 
-	;Print intro/name and directions
-	mov		edx, OFFSET Intro
-    call	WriteString
+    ;Print intro/name and directions
+    mov	    edx, OFFSET Intro
+    call    WriteString
     call    CrLf
     call    CrLf
 	
-	;Print directions
-	mov		edx, OFFSET DirectionsOne
-    call	WriteString
+    ;Print directions
+    mov	    edx, OFFSET DirectionsOne
+    call    WriteString
     mov	    eax, [ebp+16]
-	call	WriteDec
-    mov		edx, OFFSET DirectionsTwo
-    call	WriteString
+    call    WriteDec
+    mov	    edx, OFFSET DirectionsTwo
+    call    WriteString
     mov	    eax, [ebp+8]
-	call	WriteDec
-    mov		edx, OFFSET DirectionsThree
-    call	WriteString
+    call    WriteDec
+    mov	    edx, OFFSET DirectionsThree
+    call    WriteString
     mov	    eax, [ebp+12]
-	call	WriteDec
-    mov		edx, OFFSET DirectionsFour
-    call	WriteString
+    call    WriteDec
+    mov     edx, OFFSET DirectionsFour
+    call    WriteString
     call    CrLf
-    mov		edx, OFFSET DirectionsFive
-    call	WriteString
+    mov	    edx, OFFSET DirectionsFive
+    call    WriteString
     call    CrLf
-    mov		edx, OFFSET DirectionsSix
-    call	WriteString
+    mov	    edx, OFFSET DirectionsSix
+    call    WriteString
     call    CrLf
-    mov		edx, OFFSET DirectionsSeven
-    call	WriteString
+    mov	    edx, OFFSET DirectionsSeven
+    call    WriteString
     mov	    eax, [ebp+8]
-	call	WriteDec
-    mov		edx, OFFSET DirectionsEight
-    call	WriteString
+    call    WriteDec
+    mov	    edx, OFFSET DirectionsEight
+    call    WriteString
     call    CrLf
     call    CrLf
     mov     edx, OFFSET DisplayNumbers
     call    WriteString
     call    CrLf
 
-	;Clean Stack
-	pop		ebp
-    ret		12
+    ;Clean Stack
+    pop	    ebp
+    ret	    12
 
 introduction ENDP
 
@@ -165,15 +165,15 @@ introduction ENDP
 ; Postconditions: Array must be filled with values and be size of ARRAYSIZE 
 ; Receives:
 ;   [ebp+20] = ARRAYSIZE -> Length of the array
-;	[ebp+16] = randNumberArray -> The array
-;	[ebp+12] = HI -> Constant value and upper bound for accepted values
-;	[ebp+8] = LO -> Constant value and lower bound for accepted values
+;   [ebp+16] = randNumberArray -> The array
+;   [ebp+12] = HI -> Constant value and upper bound for accepted values
+;   [ebp+8] = LO -> Constant value and lower bound for accepted values
 ; Returns: Nothing
 ; ---------------------------------------------------------------------------------
 fillArray PROC
     ;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    push    ebp
+    mov	    ebp, esp
 
     ;Move parameters and values into registers to setup array insertions
     mov     ecx, [ebp+20]
@@ -193,8 +193,8 @@ fillArray PROC
         loop    insertRandVal
 
     ;Clean Stack
-	pop     ebp
-    ret		16
+    pop     ebp
+    ret	    16
 
 fillArray ENDP
 
@@ -204,15 +204,15 @@ fillArray ENDP
 ; Preconditions: The array must be filled.
 ; Postconditions: None
 ; Receives:
-;	[ebp+16] = ZEROPAD -> Indicates if the numbers are padded with leading zeros
-;	[ebp+12] = ARRAYSIZE -> Length of the array
-;	[ebp+8]  = randNumberArray -> The array
+;   [ebp+16] = ZEROPAD -> Indicates if the numbers are padded with leading zeros
+;   [ebp+12] = ARRAYSIZE -> Length of the array
+;   [ebp+8]  = randNumberArray -> The array
 ; Returns: Prints the contents of the array to the screen.
 ; ---------------------------------------------------------------------------------
 displayList PROC
     ;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    push    ebp
+    mov	    ebp, esp
 
     ;Move parameters and values into registers to setup printing the array
     mov     ebx, 1
@@ -226,8 +226,8 @@ displayList PROC
         call    WriteDec
         mov     edx, OFFSET Spaces
         call    WriteString
-        cmp	    ebx, 20
-		jge	    newLine
+        cmp	ebx, 20
+	jge	newLine
         inc     ebx
         add     esi, 4
         loop    printArray
@@ -242,8 +242,8 @@ displayList PROC
     call    CrLf
 
     ;Clean Stack
-	pop     ebp
-    ret		12
+    pop     ebp
+    ret	    12
 
 displayList ENDP
 
@@ -253,21 +253,21 @@ displayList ENDP
 ; Preconditions: HI and LO bounds needed to create
 ; Postconditions: None
 ; Receives:
-;	[ebp+12] = HI -> Constant value and upper bound for accepted values
-;	[ebp+8]  = LO -> Constant value and lower bound for accepted values
+;   [ebp+12] = HI -> Constant value and upper bound for accepted values
+;   [ebp+8]  = LO -> Constant value and lower bound for accepted values
 ; Returns: Header is displayed
 ; ---------------------------------------------------------------------------------
 displayHeader PROC
     ;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    push    ebp
+    mov	    ebp, esp
 
     ;Display the count header
     mov     edx, OFFSET DisplayResultsOne
-    call	WriteString
+    call    WriteString
     call    CrLf
     mov     edx, OFFSET DisplayResultsTwo
-    call	WriteString
+    call    WriteString
     call    CrLf
 
     ;Move parameters and values into registers to setup printing the array
@@ -303,8 +303,8 @@ displayHeader PROC
         call    CrLf
 
     ;Clean Stack
-	pop     ebp
-    ret		8
+    pop     ebp
+    ret	    8
 
 displayHeader ENDP
 
@@ -314,14 +314,14 @@ displayHeader ENDP
 ; Preconditions: Array and array size is needed
 ; Postconditions: Array must give the exact same amount of values once organized
 ; Receives:
-;	[ebp+12] = ARRAYSIZE -> Length of the array
-;	[ebp+8]  = randNumberArray -> The array
+;   [ebp+12] = ARRAYSIZE -> Length of the array
+;   [ebp+8]  = randNumberArray -> The array
 ; Returns: Array arranged lo to hi
 ; ---------------------------------------------------------------------------------
 rearrangeList PROC
-	;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    ;Initialize Stack
+    push    ebp
+    mov	    ebp, esp
 
     ;Move parameters and values into registers to setup switching the numbers
     mov     ebx, 0
@@ -329,19 +329,19 @@ rearrangeList PROC
     mov     ecx, [ebp + 12]
     sub     ecx, 1
 
-	;Loop to put the numbers in the array in order
-	switch:
-		mov		esi, edi
-        push	esi
-		mov		ebx, ecx
-        push	ecx
-		call	switchNumbers
-		mov		ecx, ebx
-		loop	switch
+    ;Loop to put the numbers in the array in order
+    switch:
+        mov     esi, edi
+        push    esi
+	mov	ebx, ecx
+        push    ecx
+	call    switchNumbers
+	mov	ecx, ebx
+	loop    switch
 
-	;Clean Stack
-	pop     ebp
-    ret		8
+    ;Clean Stack
+    pop     ebp
+    ret	    8
 
 rearrangeList ENDP
 
@@ -353,34 +353,34 @@ rearrangeList ENDP
 ; Returns: None
 ; ---------------------------------------------------------------------------------
 switchNumbers PROC
-	;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    ;Initialize Stack
+    push    ebp
+    mov	    ebp, esp
 
     ;Switch position of the numbers if needed
-	switchNum:
-		mov		eax, [esi]
+    switchNum:
+        mov     eax, [esi]
         add     esi, 4
-		mov		edx, [esi]
+	mov	edx, [esi]
         sub     esi, 4
-		cmp		eax, edx
-		jl		continue
-        cmp		eax, edx
-		je		continue
-		mov		[esi], edx
+	cmp	eax, edx
+	jl	continue
+        cmp	eax, edx
+	je	continue
+	mov	[esi], edx
         add     esi, 4
-		mov		[esi], eax
+	mov	[esi], eax
         sub     esi, 4
 	
     ;Go to next number
-	continue:
-		add		esi, 4
-		loop	switchNum
+    continue:
+	add	esi, 4
+	loop	switchNum
 
     ;Clean Stack
-	cleanStack:
-	    pop     ebp
-        ret		8
+    cleanStack:
+	pop     ebp
+        ret	8
 
 switchNumbers ENDP
 
@@ -390,14 +390,14 @@ switchNumbers ENDP
 ; Preconditions: Original array must be sorted lo to high
 ; Postconditions: Count stored in secondary array
 ; Receives:
-;	[ebp+12] = ARRAYSIZE -> Length of the array
-;	[ebp+8]  = randNumberArray -> The array
+;   [ebp+12] = ARRAYSIZE -> Length of the array
+;   [ebp+8]  = randNumberArray -> The array
 ; Returns: None
 ; ---------------------------------------------------------------------------------
 countList PROC
     ;Initialize Stack
-	push	ebp
-    mov		ebp, esp
+    push    ebp
+    mov	    ebp, esp
 
     ;Move parameters and values into registers to setup switching the numbers
     mov     ecx, [ebp+8]
@@ -440,8 +440,8 @@ countList PROC
         loop    countNumbers
 
     ;Clean Stack
-	pop     ebp
-    ret		16
+    pop     ebp
+    ret	    16
 
 countList ENDP
 
@@ -450,9 +450,9 @@ countList ENDP
 ; Descritpion: Displays an goodbye message and the directions for the program.
 ; ---------------------------------------------------------------------------------
 goodbye PROC
-	;Print goodbye message
+    ;Print goodbye message
     mov     edx, OFFSET GoodbyeMessage
-    call	WriteString
+    call    WriteString
     call    CrLf
     exit
 
